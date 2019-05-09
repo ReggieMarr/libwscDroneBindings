@@ -91,7 +91,11 @@ void PyBebop::killDrone() {
     acquire();
     assert(!owns_gil());
 #endif
-    m_drone->getPilot()->CUT_THE_MOTORS();
+    landDrone();
+    m_drone->getVideoDriver()->stop();
+    m_drone->getDroneController()->stop();
+
+    // m_drone->getPilot()->CUT_THE_MOTORS();
 #ifdef GIL_HANDLER
     restore();
 #endif
@@ -144,48 +148,6 @@ void PyBebop::moveRelativeMetres(float x, float y)
     m_drone->getPilot()->moveRelativeMetres(x, y, 0);
 }
 
-#define USE_CTYPES
-
-#ifndef USE_CTYPES
-
-#include <boost/python.hpp>
-#include <boost/python/stl_iterator.hpp>
-// #include "PyBebop.h"
-// #include "gilHandler.hpp"
-
-PyObject* getFrameBuffer_wrap(PyBebop& self)
-{
-    PyObject* pymemview;
-    char* export_data;
-
-    export_data = self.getFrameBuffer();
-
-    int frameSize = wscDrone::BEBOP2_STREAM_HEIGHT * wscDrone::BEBOP2_STREAM_WIDTH * 3;
-    pymemview = PyMemoryView_FromMemory((char*) export_data, frameSize, PyBUF_READ);
-    // return PyBytes_FromObject(pymemview);
-    return pymemview;
-}
-
-using namespace boost::python;
-
-
-BOOST_PYTHON_MODULE(libwscDrone)
-{
-    class_<PyBebop>("PyBebop", init<int>())
-        // .def("changeCount", &PyBebop::PyBebop)
-        // .def("changeCount", &PyBebop::changeCount)
-        .def("takeoffDrone",       &PyBebop::takeoffDrone)
-        .def("moveRelativeMetres", &PyBebop::moveRelativeMetres)
-        .def("landDrone",          &PyBebop::landDrone)
-        .def("stopDrone",          &PyBebop::stopDrone)
-        .def("getFrameBuffer",     &getFrameBuffer_wrap)
-        .def("killDrone",          &PyBebop::killDrone)
-        // .def("getBatteryLevel", &PyBebop::getBatteryLevel)
-        // .def("setBatteryLevel", &PyBebop::setBatteryLevel)
-    ;
-}
-
-#else
 
 extern "C"
 {
@@ -200,7 +162,6 @@ extern "C"
     void CppPyIF_landDrone(PyBebop *PyIF) { PyIF->landDrone(); } 
 }
 
-#endif
 
 /********
 * API

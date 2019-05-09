@@ -91,7 +91,10 @@ void Bebop2CtrlIF::killDrone() {
     acquire();
     assert(!owns_gil());
 #endif
-    m_drone->getPilot()->CUT_THE_MOTORS();
+    landDrone();
+    m_drone->getVideoDriver()->stop();
+    m_drone->getDroneController()->stop();
+    // m_drone->getPilot()->CUT_THE_MOTORS();
 #ifdef GIL_HANDLER
     restore();
 #endif
