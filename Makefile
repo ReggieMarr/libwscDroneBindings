@@ -25,6 +25,9 @@ endif
 ifndef DIST_DIR
 DIST_DIR = $(CURDIR)/dist
 endif
+ifndef DIST_INCDIR
+DIST_INCDIR = $(DIST_DIR)/include
+endif
 
 ifndef DIST_LIBDIR
 DIST_LIBDIR = $(DIST_DIR)/lib/
@@ -58,7 +61,8 @@ SYS_LIB += -L/usr/local/lib
 # SYS_LIB += -L$(LIBWSCDRONE)/dist/lib -Wl,--whole-archive -lwscDrone
 SYS_INC += -I/usr/local/include -I/usr/include/python3.6
 
-LOCAL_INCDIR = $(CURDIR)/src/
+LOCAL_INCDIR = $(CURDIR)/src
+LOCAL_INCDIR += $(CURDIR)/inc
 SYS_LIB = -L=/usr/local/lib -L/usr/bin/python3.6
 #COMMON_FLAGS += -pedantic -Wall -Wextra -Wno-deprecated-declarations
 COMMON_FLAGS += -Wno-deprecated-declarations
@@ -92,7 +96,8 @@ OBJECTS_BINDINGS_CPP = $(addsuffix .o, $(addprefix $(OBJDIR), $(CPP_BINDINGS_SRC
 # TESTLIBPATH = -L/usr/local/lib -lpthread -lrtsp -lsdp -lmux -lpomp -ljson-c -lulog -lfutils
 TESTLIBPATH += -Wl,--whole-archive -L$(LIBWSCDRONE)/dist/lib -lwscDrone
 
-all: directories binding_headers $(DYN_TARGET) $(STATIC_TARGET)
+all: directories binding_headers $(OBJECTS_BINDINGS_CPP)
+# all: directories binding_headers $(DYN_TARGET) $(STATIC_TARGET)
 
 directories:
 	mkdir -p $(OUTPUT_DIRS)
@@ -103,24 +108,19 @@ directories:
 # 	${CC} ${FLAGS} -o ${TARGET_NAME} ${SOURCES_BINDINGS_CPP} ${SYS_INC} ${LOC_INC} ${LOC_LIB} ${SYS_LIB}
 
 binding_headers:
-	cp -f $(BINDING_HEADERS) $(DIST_INCDIR)/$(PREFIX)
+	cp -f $(BINDING_HEADERS) $(DIST_INCDIR)
 
-$(DYN_TARGET):  $(OBJECTS_BINDINGS_CPP)
-	$(CXX) $(LDFLAGS) -o $(DYN_TARGET)  $(OBJECTS_BINDINGS_CPP) $(TESTLIBPATH)
+$(DYN_TARGET): $(OBJECTS_BINDINGS_CPP)
+	$(CXX) $(LDFLAGS) -o $(DYN_TARGET) $(OBJECTS_BINDINGS_CPP) $(TESTLIBPATH)
 	ln -f -s lib$(TARGET_NAME).so.$(LIB_VER) $(DIST_LIBDIR)/lib$(TARGET_NAME).so
 	ln -f -s lib$(TARGET_NAME).so.$(LIB_VER) $(DIST_LIBDIR)/lib$(TARGET_NAME).so.$(LIB_MAJOR_VER)
 	ln -f -s lib$(TARGET_NAME).so.$(LIB_VER) $(DIST_LIBDIR)/lib$(TARGET_NAME).so.$(LIB_MAJOR_VER).$(LIB_MINOR_VER)
-# $(DYN_TARGET):  $(OBJECTS_BINDINGS_CPP)
-# 	$(CXX) $(LDFLAGS) -o $(DYN_TARGET)  $(OBJECTS_BINDINGS_CPP)  -Wl,-Bstatic $(SYS_STAT_LIBS) -Wl,-Bdynamic $(SYS_DYN_LIBS)
-# 	ln -f -s lib$(TARGET_NAME).so.$(LIB_VER) $(DIST_LIBDIR)/lib$(TARGET_NAME).so
-# 	ln -f -s lib$(TARGET_NAME).so.$(LIB_VER) $(DIST_LIBDIR)/lib$(TARGET_NAME).so.$(LIB_MAJOR_VER)
-# 	ln -f -s lib$(TARGET_NAME).so.$(LIB_VER) $(DIST_LIBDIR)/lib$(TARGET_NAME).so.$(LIB_MAJOR_VER).$(LIB_MINOR_VER)
 
 $(STATIC_TARGET):  $(OBJECTS_BINDINGS_CPP)
 	$(AR) $(ARFLAGS) $(STATIC_TARGET)  $(OBJECTS_BINDINGS_CPP)
 
 $(OBJDIR)%.o: $(BINDINGS_SRCDIR)%.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(DEFAULTFLAGS) -c -o $@ $<
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(DEFAULTFLAGS) -c -o $@ $< 
 
 $(OBJDIR)%.o: $(BINDINGS_SRCDIR)%.c
 
