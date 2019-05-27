@@ -32,6 +32,7 @@ endif
 ifndef DIST_LIBDIR
 DIST_LIBDIR = $(DIST_DIR)/lib/
 endif
+TARGET_NAME = wscDroneBindings
 
 OBJDIR = $(CURDIR)/obj/
 PREFIX = usr/local/include/
@@ -45,7 +46,6 @@ CXX = $(TOOL_PREFIX)g++
 AR = $(TOOL_PREFIX)ar
 LD = $(TOOL_PREFIX)ld
 
-TARGET_NAME = wscDroneBindings
 
 DYN_TARGET_LIST    = lib$(TARGET_NAME).so.$(LIB_VER)
 STATIC_TARGET_LIST = lib$(TARGET_NAME).a
@@ -60,9 +60,9 @@ SYS_LIB += -L/usr/local/lib
 # SYS_LIB += -lpthread -lrtsp -lsdp -lmux -lpomp -ljson-c -lulog -lfutils
 # SYS_LIB += -L$(LIBWSCDRONE)/dist/lib -Wl,--whole-archive -lwscDrone
 SYS_INC += -I/usr/local/include -I/usr/include/python3.6
+SYS_INC += -I$(ARSDK3)/include
 
-LOCAL_INCDIR = $(CURDIR)/src
-LOCAL_INCDIR += $(CURDIR)/inc
+LOCAL_INCDIR = $(CURDIR)/inc
 SYS_LIB = -L=/usr/local/lib -L/usr/bin/python3.6
 #COMMON_FLAGS += -pedantic -Wall -Wextra -Wno-deprecated-declarations
 COMMON_FLAGS += -Wno-deprecated-declarations
@@ -96,8 +96,8 @@ OBJECTS_BINDINGS_CPP = $(addsuffix .o, $(addprefix $(OBJDIR), $(CPP_BINDINGS_SRC
 # TESTLIBPATH = -L/usr/local/lib -lpthread -lrtsp -lsdp -lmux -lpomp -ljson-c -lulog -lfutils
 TESTLIBPATH += -Wl,--whole-archive -L$(LIBWSCDRONE)/dist/lib -lwscDrone
 
-all: directories binding_headers $(OBJECTS_BINDINGS_CPP)
-# all: directories binding_headers $(DYN_TARGET) $(STATIC_TARGET)
+# all: directories binding_headers $(OBJECTS_BINDINGS_CPP)
+all: directories binding_headers $(STATIC_TARGET) $(DYN_TARGET)
 
 directories:
 	mkdir -p $(OUTPUT_DIRS)
@@ -120,7 +120,7 @@ $(STATIC_TARGET):  $(OBJECTS_BINDINGS_CPP)
 	$(AR) $(ARFLAGS) $(STATIC_TARGET)  $(OBJECTS_BINDINGS_CPP)
 
 $(OBJDIR)%.o: $(BINDINGS_SRCDIR)%.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(DEFAULTFLAGS) -c -o $@ $< 
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(DEFAULTFLAGS) -c -o $@ $<
 
 $(OBJDIR)%.o: $(BINDINGS_SRCDIR)%.c
 

@@ -12,13 +12,13 @@
 // #include "wscDrone/DroneController.h"
 // #include "wscDrone/CameraControl.h"
 // #include "wscDrone/Pilot.h"
-// #include "wscDrone/Bebop2FrameIF.h"
+#include "Bebop2FrameIF.h"
 // #include "wscDrone/Semaphore.h"
 // #include "wscDrone/Utils.h"
 // #include "wscDrone/VideoDecoder.h"
 // #include "wscDrone/VideoDriver.h"
 // #include "wscDrone/VideoFrame.h"
-// #include "wscDrone.h"
+#include "wscDrone.h"
 // #include "../inc/gilHandler.hpp"
 
 using VideoFrameGeneric = Bebop2FrameIF; //IS THIS OK STEVE??
