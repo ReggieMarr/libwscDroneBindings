@@ -1,0 +1,11 @@
+CXX=g++
+
+LOCAL_LIB += -L./dist/lib -lwscDroneBindings -L../libwscDrone/dist/lib -lwscDrone
+LOCAL_INC += -I./inc -I../libwscDrone/dist/include
+
+SYS_DYN_LIBS_LIST += arsal arcommands ardiscovery arcontroller armedia arnetwork arnetworkal arstream arstream2
+SYS_DYN_LIBS_LIST += avformat avcodec avutil swscale
+SYS_DYN_LIBS  = -L$(ARSDK3)/lib $(addprefix -l, $(SYS_DYN_LIBS_LIST))
+
+all:
+	g++ -o test testWscDroneBindings.c $(LOCAL_LIB) $(LOCAL_INC) -I$(ARSDK3)/include $(SYS_DYN_LIBS)

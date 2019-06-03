@@ -180,12 +180,12 @@ extern "C"
 {
 #endif
     Bebop2CtrlIF* CppPyIF(int callSign) { return new Bebop2CtrlIF(callSign); }
-    void CppPyIF_takeoffDrone(Bebop2CtrlIF *Bebop2CtrlIF_IF) { Bebop2CtrlIF_IF->takeoffDrone(); }
-    void CppPyIF_killDrone(Bebop2CtrlIF *Bebop2CtrlIF_IF) { Bebop2CtrlIF_IF->killDrone(); }
-    void CppPyIF_moveRelativeMetres(Bebop2CtrlIF *PyIF, float x, float y) { 
-        PyIF->moveRelativeMetres(x, y); 
+    void CppPyIF_takeoffDrone(Bebop2CtrlIF *PyIF) { PyIF->takeoffDrone(); }
+    void CppPyIF_killDrone(Bebop2CtrlIF *PyIF) { PyIF->killDrone(); }
+    void CppPyIF_moveRelativeMetres(Bebop2CtrlIF *PyIF, float x, float y) {
+        PyIF->moveRelativeMetres(x, y);
     }
-    void CppPyIF_landDrone(Bebop2CtrlIF *PyIF) { PyIF->landDrone(); } 
+    void CppPyIF_landDrone(Bebop2CtrlIF *PyIF) { PyIF->landDrone(); }
     // need to pass wscDrone::MoveDirection enum here
     // void CppPyIF_moveDirection(Bebop2CtrlIF *PyIF, MoveDirection dir) { PyIF->moveDirection(dir); }
     void CppPyIF_setHeading(Bebop2CtrlIF *PyIF, float heading) { PyIF->setHeading(heading); }

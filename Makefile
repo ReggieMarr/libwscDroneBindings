@@ -63,14 +63,14 @@ SYS_INC += -I/usr/local/include -I/usr/include/python3.6
 SYS_INC += -I$(ARSDK3)/include
 
 LOCAL_INCDIR = $(CURDIR)/inc
-SYS_LIB = -L=/usr/local/lib -L/usr/bin/python3.6
-#COMMON_FLAGS += -pedantic -Wall -Wextra -Wno-deprecated-declarations
-COMMON_FLAGS += -Wno-deprecated-declarations
+SYS_LIB = -L=/usr/local/lib -L/usr/bin/python3.6 -L$(ARSDK3)/lib
+COMMON_FLAGS += -pedantic 
+# COMMON_FLAGS += -Wno-deprecated-declarations
 # shared library flags
-COMMON_FLAGS += -shared -fPIC
+# COMMON_FLAGS += -shared -fPIC
 CPPFLAGS     += -I$(LOCAL_INCDIR) $(SYS_INC)
-CPPFLAGS     += -L$(LIBWSCDRONE)/dist/lib -Wl,--whole-archive -lwscDrone
-CXXFLAGS     += -std=c++14 $(COMMON_FLAGS)
+CPPFLAGS     += -L$(LIBWSCDRONE)/dist/lib -lwscDrone -Wl,-unresolved-symbols=ignore-in-shared-libs
+CXXFLAGS     += -std=c++14 $(COMMON_FLAGS) -fPIC
 LDFLAGS      += -shared -fPIC
 # for Bebop2 SDK
 SYS_DYN_LIBS_LIST += arsal arcommands ardiscovery arcontroller armedia arnetwork arnetworkal arstream arstream2
@@ -93,8 +93,9 @@ BINDING_HEADERS = $(addsuffix .h, $(addprefix $(BINDINGS_INCDIR), $(CPP_BINDINGS
 SOURCES_BINDINGS_CPP = $(addsuffix .cpp, $(addprefix $(BINDINGS_SRCDIR), $(CPP_BINDINGS_SRC_LIST)))
 OBJECTS_BINDINGS_CPP = $(addsuffix .o, $(addprefix $(OBJDIR), $(CPP_BINDINGS_SRC_LIST)))
 
-# TESTLIBPATH = -L/usr/local/lib -lpthread -lrtsp -lsdp -lmux -lpomp -ljson-c -lulog -lfutils
-TESTLIBPATH += -Wl,--whole-archive -L$(LIBWSCDRONE)/dist/lib -lwscDrone
+TESTLIBPATH = -L/usr/x86_64-linux-gnu/lib -lpthread 
+#-lrtsp -lsdp -lmux -lpomp -ljson-c -lulog -lfutils
+# TESTLIBPATH += -Wl,--whole-archive -L$(LIBWSCDRONE)/dist/lib -lwscDrone
 
 # all: directories binding_headers $(OBJECTS_BINDINGS_CPP)
 all: directories binding_headers $(STATIC_TARGET) $(DYN_TARGET)
@@ -111,7 +112,7 @@ binding_headers:
 	cp -f $(BINDING_HEADERS) $(DIST_INCDIR)
 
 $(DYN_TARGET): $(OBJECTS_BINDINGS_CPP)
-	$(CXX) $(LDFLAGS) -o $(DYN_TARGET) $(OBJECTS_BINDINGS_CPP) $(TESTLIBPATH)
+	$(CXX) $(LDFLAGS) -o $(DYN_TARGET) $(OBJECTS_BINDINGS_CPP) $(TESTLIBPATH) -Wl,-Bdynamic $(SYS_DYN_LIBS)
 	ln -f -s lib$(TARGET_NAME).so.$(LIB_VER) $(DIST_LIBDIR)/lib$(TARGET_NAME).so
 	ln -f -s lib$(TARGET_NAME).so.$(LIB_VER) $(DIST_LIBDIR)/lib$(TARGET_NAME).so.$(LIB_MAJOR_VER)
 	ln -f -s lib$(TARGET_NAME).so.$(LIB_VER) $(DIST_LIBDIR)/lib$(TARGET_NAME).so.$(LIB_MAJOR_VER).$(LIB_MINOR_VER)
